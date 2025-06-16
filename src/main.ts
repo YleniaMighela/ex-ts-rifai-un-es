@@ -1,24 +1,43 @@
-import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
+// dati dell'oggetto  ricetta
+type Ricetta = {
+  id: number;
+  name: string;
+  userId: number;
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+};
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+// dati dell'oggetto  chef
+type Chef = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  birthDate: string;
+}
+
+
+async function getChefBirthday(id: number): Promise<string> {
+
+  try {
+    const ricettaResponse: Response = await fetch(`https://dummyjson.com/recipes/${id}`)
+    const ricettaId: Ricetta = await ricettaResponse.json();
+    // console.log(ricettaId);
+
+    const infoChef: Response = await fetch(`https://dummyjson.com/users/${ricettaId.userId}`)
+    const chefId: Chef = await infoChef.json();
+    // console.log(chefId);
+
+    return chefId.birthDate;
+  } catch (error: any) {
+    throw new Error("Errore nel recupero della data di nascita dello chef");
+  }
+}
+
+// Esempio di utilizzo
+getChefBirthday(1)
+  .then((birthday: string) => {
+    console.log("📅 Data di nascita dello chef:", birthday);
+  })
+  .catch((error: Error) => {
+    console.error("❌ Errore:", error.message);
+  });
+
